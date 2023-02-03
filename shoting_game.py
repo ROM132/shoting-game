@@ -34,6 +34,9 @@ class start_screen:
         self.option = pygame.image.load('buttons/option.png').convert_alpha()
         self.option_rect = self.option.get_rect(center=(800, 600))
 
+        # volume
+        self.volume = 10
+
     def show_background(self):
         # show the background
         screen.blit(self.background, (0,0))
@@ -44,9 +47,16 @@ class start_screen:
         screen.blit(self.quit, self.quit_rect)
         screen.blit(self.option, self.option_rect)
 
+    def set_volume(self, val):
+        self.volume = float(val) / 100
+        mixer.music.set_volume(self.volume)
+        self.volume = self.volume * 100
+        
+
     # setting up the option button
     def option_button(self):
         pos = pygame.mouse.get_pos()
+
 
         if self.option_rect.collidepoint(pos):
             if pygame.mouse.get_pressed()[0]:
@@ -59,7 +69,9 @@ class start_screen:
 
                 # create a scale to control the music value
                 scale = Scale(self.root, from_=0, to=100, orient=HORIZONTAL, command=self.set_volume, width=20)
-                scale.set(10) # set the initial value to 50
+                scale.set(self.volume) # set the initial value to 50
+                self.volume = scale.get()
+            
                 
                 # create a text near the scale
                 scale_text = Label(self.root, text='Volume:', font=('Times', 25))
@@ -74,8 +86,15 @@ class start_screen:
                 scale.grid(row=2, column=1, sticky='w')
                 scale_text.grid(row=2, column=0, pady=5)
 
+                # check if he closed the screen
+                self.root.protocol("WM_DELETE_WINDOW", self.closed_tkinter)
 
                 self.root.mainloop()
+
+    def closed_tkinter(self):
+        self.root.destroy()
+        pyautogui.click()
+
 
     def center_window(self, root, window_width, window_height):
         screen_width = root.winfo_screenwidth()
@@ -84,9 +103,6 @@ class start_screen:
         y_coord = (screen_height/2) - (window_height/2)
         root.geometry("%dx%d+%d+%d" % (window_width, window_height, x_coord, y_coord))
     
-    def set_volume(self, val):
-        volume = float(val) / 100
-        mixer.music.set_volume(volume)
 
 
 # create the screen
