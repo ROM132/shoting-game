@@ -37,6 +37,19 @@ class start_screen:
         # volume
         self.volume = 10
 
+        # check if you can play
+        self.play_check = False
+
+        # get a check of the number of the level and the x,y position
+        self.num_level = 0
+
+        self.y_levels = 115
+        self.x_levels = 200
+
+        # create a list to store all the levels rect
+        self.levels_rect_list = []
+        self.levels_list = []
+
     def show_background(self):
         # show the background
         screen.blit(self.background, (0,0))
@@ -52,7 +65,6 @@ class start_screen:
         mixer.music.set_volume(self.volume)
         self.volume = self.volume * 100
         
-
     # setting up the option button
     def option_button(self):
         pos = pygame.mouse.get_pos()
@@ -96,7 +108,6 @@ class start_screen:
         self.root.destroy()
         pyautogui.click()
 
-
     def center_window(self, root, window_width, window_height):
         screen_width = root.winfo_screenwidth()
         screen_height = root.winfo_screenheight()
@@ -104,7 +115,77 @@ class start_screen:
         y_coord = (screen_height/2) - (window_height/2)
         root.geometry("%dx%d+%d+%d" % (window_width, window_height, x_coord, y_coord))
     
+    def quit_(self):
+        pos = pygame.mouse.get_pos()
 
+        if self.quit_rect.collidepoint(pos):
+            if pygame.mouse.get_pressed()[0]:
+                exit()
+
+    def play_(self):
+        pos = pygame.mouse.get_pos()
+
+        if self.play_rect.collidepoint(pos):
+            if pygame.mouse.get_pressed()[0]:
+                self.play_check = True
+
+        # check if he can play
+        if self.play_check == True:
+            self.pick_level()
+    
+    def pick_level(self):
+        self.handle_back_button()
+        self.show_levels()
+
+        
+
+    def show_levels(self):
+        if self.num_level <= 19:
+            levels = pygame.image.load(f'levels/level {self.num_level + 1}.png').convert_alpha()
+            levels_rect = levels.get_rect(center=(self.x_levels, self.y_levels))
+
+            self.num_level += 1
+            self.y_levels += 115
+            
+            
+            # store the values in a lists
+            self.levels_list.append(levels)
+            self.levels_rect_list.append(levels_rect)
+
+            # increase the x on the rect of the levels and rest the y
+            if self.num_level % 5 == 0:
+                self.x_levels += 400
+                self.y_levels = 115
+                
+
+
+        for level, rect in zip(self.levels_list, self.levels_rect_list):
+                screen.blit(level, rect)
+
+
+    def handle_back_button(self):     
+        # un show all the thing on the screen
+        self.quit_rect = self.quit.get_rect(center=(-100, -1000))
+        self.play_rect = self.play.get_rect(center=(-100, -1000))
+        self.option_rect = self.option.get_rect(center=(-100, -1000))
+
+        # create a back button
+        back_button = pygame.image.load('buttons/Back.png').convert_alpha()
+        back_button_rect = back_button.get_rect(center=(160, 750))
+        
+        # show him
+        screen.blit(back_button, back_button_rect)
+
+        # call the function of the back button
+        self.back_button_function(back_button_rect)
+        
+    def back_button_function(self, back_button_rect):
+        pos = pygame.mouse.get_pos()
+
+        if back_button_rect.collidepoint(pos):
+            if pygame.mouse.get_pressed()[0]:
+                self.play_check = False
+                self.__init__()
 
 # create the screen
 pygame.init()
@@ -125,7 +206,8 @@ while True:
     s.show_background()
     s.show_buttons()
     s.option_button()
-
+    s.quit_()
+    s.play_()
 
     pygame.display.update()
     clock.tick(120)
