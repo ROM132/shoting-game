@@ -61,6 +61,7 @@ class start_screen:
         if self.option_rect.collidepoint(pos):
             if pygame.mouse.get_pressed()[0]:
                 self.root = Tk()
+                self.root.title('Settings')
                 self.center_window(self.root, 400, 400)
 
                 # the tkinter window will always stays on top of other windows
