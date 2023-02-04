@@ -42,6 +42,8 @@ class start_level_one:
         # check if you shot
         self.check_shot = False
 
+        # delay time shot
+        self.delay_time_shot = 100
 
         # enami
         self.enami = pygame.Surface((30, 30)).convert_alpha()
@@ -58,9 +60,11 @@ class start_level_one:
 
         # i dont need this but i have to put this here dont mind dont mind
         self.last_enami_spawn = pygame.time.get_ticks()
+        self.last_shot_time = pygame.time.get_ticks()
+
 
         # enami spawn limit
-        self.enami_speed = 20
+        self.enami_speed = 40
 
 
     def show_background(self):        
@@ -118,21 +122,29 @@ class start_level_one:
     def shot_bullet(self):
         keys = pygame.key.get_pressed()
         
-        if keys[pygame.K_SPACE]:
+        if keys[pygame.K_SPACE] and self.check_shot:
+            self.last_shot_time = pygame.time.get_ticks()
+
             self.bullet_rect = self.bullet.get_rect(center=(self.player_rect.x+90, self.player_rect.y+60))
 
             # append the self.bullet_rect in the list to store it
             self.bullets_list.append(self.bullet_rect)
 
             # make it true
-            self.check_shot = True
+            self.check_shot = False
 
-        if self.check_shot == True:
-            for rect in self.bullets_list:
-                self.bullets_velocity_x = self.bullets_speed
+        if not self.check_shot:
+            time_since_last_shot  = pygame.time.get_ticks() - self.last_shot_time
 
-                rect.x += self.bullets_velocity_x
-                screen.blit(self.bullet, rect)
+            if time_since_last_shot >= self.delay_time_shot:  # 500 milliseconds = 0.5 seconds
+                self.check_shot = True
+
+        
+        for rect in self.bullets_list:
+            self.bullets_velocity_x = self.bullets_speed
+
+            rect.x += self.bullets_velocity_x
+            screen.blit(self.bullet, rect)
 
     def enami_settings(self):
         if self.can_spawn_enami:
@@ -158,7 +170,7 @@ class start_level_one:
 
         player_center = self.player_rect.center
         for rect in self.enamis_list:
-            velocity = [ (player_center[0] - rect.centerx) / 10, (player_center[1] - rect.centery) / 10 ]
+            velocity = [ (player_center[0] - rect.centerx) / self.enami_speed, (player_center[1] - rect.centery) / self.enami_speed ]
             rect.x += velocity[0]
             rect.y += velocity[1]
             for other_rect in self.enamis_list:
@@ -171,6 +183,16 @@ class start_level_one:
         # show the player
         screen.blit(self.player, self.player_rect)
             
+    def collision_enami_bullet(self):
+        for bullet_rect in self.bullets_list:
+            for enami_rect in self.enamis_list:
+
+                # check for collision
+                if bullet_rect.colliderect(enami_rect):
+                    # remove the bullet and the enami
+                    self.enamis_list.remove(enami_rect)
+                    self.bullets_list.remove(bullet_rect)
+
 
 
 # create the screen
@@ -225,6 +247,7 @@ while True:
     level_one.player_movement()
     level_one.shot_bullet()
     level_one.enami_settings()
+    level_one.collision_enami_bullet()
 
     pygame.display.update()
     clock.tick(120)
