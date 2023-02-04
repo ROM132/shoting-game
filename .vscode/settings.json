@@ -1,8 +1,14 @@
 {
     "cSpell.words": [
         "bottomleft",
+        "centerx",
+        "centery",
+        "colliderect",
         "columnspan",
+        "KEYDOWN",
+        "KEYUP",
         "pyautogui",
-        "pygame"
+        "pygame",
+        "respawn"
     ]
 }

@@ -8,6 +8,21 @@ import csv
 from pygame import mixer
 from tkinter import *
 
+# levels.py
+def level_1_action():
+    import level_1_file
+    level_1_file.start_level_one()
+
+
+
+
+
+
+
+
+
+
+
 # create the start screen
 class start_screen:
     def __init__(self):
@@ -50,6 +65,7 @@ class start_screen:
         self.levels_rect_list = []
         self.levels_list = []
 
+
     def show_background(self):
         # show the background
         screen.blit(self.background, (0,0))
@@ -68,7 +84,6 @@ class start_screen:
     # setting up the option button
     def option_button(self):
         pos = pygame.mouse.get_pos()
-
 
         if self.option_rect.collidepoint(pos):
             if pygame.mouse.get_pressed()[0]:
@@ -137,7 +152,28 @@ class start_screen:
         self.handle_back_button()
         self.show_levels()
 
-        
+        # pick level
+        pos = pygame.mouse.get_pos()
+
+        level_data = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
+        level_messages = {
+            1: level_1_action,
+            2: 'level 2',
+            3: 'level 3',
+            
+        }
+
+
+        for i, rect in enumerate(self.levels_rect_list):
+            if rect.collidepoint(pos):
+                if pygame.mouse.get_pressed()[0]:
+                    level = level_data[i]
+
+                    if level in level_messages:
+                        level_messages[level]()
+                        pygame.quit()
+                    else:
+                        print('No action defined for level', level)
 
     def show_levels(self):
         if self.num_level <= 19:
@@ -161,7 +197,6 @@ class start_screen:
 
         for level, rect in zip(self.levels_list, self.levels_rect_list):
                 screen.blit(level, rect)
-
 
     def handle_back_button(self):     
         # un show all the thing on the screen
