@@ -90,6 +90,9 @@ class start_level_one:
         self.spawn_bullets_x = random.randint(0, 1515)
         self.spawn_bullets_y = random.randint(0, 720)
 
+        # check if he closed the settings
+        self.closed_settings = False
+
     def show_background(self):       
         # get the size of the screen
         info = pygame.display.Info()
@@ -270,20 +273,40 @@ class start_level_one:
                         pass
     
     def settings_fun(self):
+        screen.blit(self.settings, self.settings_rect)
         pos = pygame.mouse.get_pos()
 
         if self.settings_rect.collidepoint(pos):
             if pygame.mouse.get_pressed()[0]:
-                print('work')
+                # tkinter root and title
+                self.root = Tk()
+                self.root.title('Settings')
+                self.center_window(self.root, 400, 400)
 
+
+                # the tkinter window will always stays on top of other windows
+                # self.root.attributes('-topmost', True)
+
+                pygame.display.update()
+                self.root.mainloop()
+
+            
+    def center_window(self, root, window_width, window_height):
+        if not root.winfo_exists():
+            return
+        screen_width = root.winfo_screenwidth()
+        screen_height = root.winfo_screenheight()
+        x_coord = (screen_width/2) - (window_width/2)
+        y_coord = (screen_height/2) - (window_height/2)
+        root.geometry("%dx%d+%d+%d" % (window_width, window_height, x_coord, y_coord))
+    
+    def create_root(self):
         
-        screen.blit(self.settings, self.settings_rect)
-
-
-
 
 # create the screen
 pygame.init()
+running = True
+
 screen = pygame.display.set_mode((1600,800))
 title = pygame.display.set_caption("Shooting game")
 clock = pygame.time.Clock()
@@ -292,7 +315,7 @@ clock = pygame.time.Clock()
 level_one = start_level_one()
 
 # start the loop
-while True:
+while running == True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             exit()
