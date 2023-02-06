@@ -93,6 +93,12 @@ class start_level_one:
         # check if he closed the settings
         self.closed_settings = False
 
+        self.root = Tk()
+        self.root.title('Settings')
+        self.root.destroy()
+
+
+
     def show_background(self):       
         # get the size of the screen
         info = pygame.display.Info()
@@ -279,20 +285,18 @@ class start_level_one:
         if self.settings_rect.collidepoint(pos):
             if pygame.mouse.get_pressed()[0]:
                 try:
-                    self.create_root()
+                    self.root = Tk()
+                    print('work')
                 except:
                     pass
+
                 self.center_window(self.root, 400, 400)
-
-                
-
-
-
 
 
 
                 # the tkinter window will always stays on top of other windows
                 self.root.attributes('-topmost', True)
+
 
                 # check if he closed the screen
                 self.root.protocol("WM_DELETE_WINDOW", self.closed_tkinter)
@@ -300,23 +304,17 @@ class start_level_one:
 
                 self.root.mainloop()
 
-            
+    
+    def closed_tkinter(self):
+        self.root.destroy()
+    
     def center_window(self, root, window_width, window_height):
-        if not root.winfo_exists():
-            return
-        screen_width = root.winfo_screenwidth()
-        screen_height = root.winfo_screenheight()
+        screen_width = 1920
+        screen_height = 1080
         x_coord = (screen_width/2) - (window_width/2)
         y_coord = (screen_height/2) - (window_height/2)
         root.geometry("%dx%d+%d+%d" % (window_width, window_height, x_coord, y_coord))
-    
-    def create_root(self):
-        # tkinter root and title
-        self.root = Tk()
-        self.root.title('Settings')
-
-    def closed_tkinter(self):
-        self.root.destroy()
+        
 
 # create the screen
 pygame.init()
