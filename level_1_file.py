@@ -7,6 +7,8 @@ from pyautogui import *
 import csv
 from pygame import mixer
 from tkinter import *
+import math
+
 
 
 class start_level_one:
@@ -61,6 +63,9 @@ class start_level_one:
         # i dont need this but i have to put this here dont mind dont mind
         self.last_enami_spawn = pygame.time.get_ticks()
         self.last_shot_time = pygame.time.get_ticks()
+        self.time = 0
+        self.bullets_collect_rect = None
+        self.current_time = pygame.time.get_ticks()
 
 
         # enami spawn limit
@@ -70,8 +75,22 @@ class start_level_one:
         self.settings = pygame.image.load('texture/settings.png').convert_alpha()
         self.settings_rect = self.settings.get_rect(topleft=(0,0))
 
+        # create a list to check how much bullet are shots until now and a variable that control if you can shot
+        self.bullet_full_list = []
+        self.bullet_can_shot = True
+        self.bullet_num = 15
 
-    def show_background(self):        
+        # create the texture of the collectable bullets
+        self.collectable_bullets = pygame.image.load('texture/collected_bullets.png').convert_alpha()
+
+        # check if he collect the bullet
+        self.collect_bullet_check = False
+
+        # the spawn point of the bullets collector
+        self.spawn_bullets_x = random.randint(0, 1515)
+        self.spawn_bullets_y = random.randint(0, 720)
+
+    def show_background(self):       
         # get the size of the screen
         info = pygame.display.Info()
         screen_width = info.current_w
@@ -124,31 +143,81 @@ class start_level_one:
             self.player_rect.y = -14
         
     def shot_bullet(self):
-        keys = pygame.key.get_pressed()
-        
-        if keys[pygame.K_SPACE] and self.check_shot:
-            self.last_shot_time = pygame.time.get_ticks()
+        if self.bullet_can_shot == True:
+            keys = pygame.key.get_pressed()
+            
+            if keys[pygame.K_SPACE] and self.check_shot:
+                self.last_shot_time = pygame.time.get_ticks()
 
-            self.bullet_rect = self.bullet.get_rect(center=(self.player_rect.x+90, self.player_rect.y+60))
+                self.bullet_rect = self.bullet.get_rect(center=(self.player_rect.x+90, self.player_rect.y+60))
 
-            # append the self.bullet_rect in the list to store it
-            self.bullets_list.append(self.bullet_rect)
+                # append the self.bullet_rect in the list to store it
+                self.bullets_list.append(self.bullet_rect)
+                self.bullet_full_list.append(self.bullet_rect)
 
-            # make it true
-            self.check_shot = False
+                # make it true
+                self.check_shot = False
 
-        if not self.check_shot:
-            time_since_last_shot  = pygame.time.get_ticks() - self.last_shot_time
+            if not self.check_shot:
+                time_since_last_shot  = pygame.time.get_ticks() - self.last_shot_time
 
-            if time_since_last_shot >= self.delay_time_shot:  # 500 milliseconds = 0.5 seconds
-                self.check_shot = True
+                if time_since_last_shot >= self.delay_time_shot:  # 500 milliseconds = 0.5 seconds
+                    self.check_shot = True
 
-        
+            
         for rect in self.bullets_list:
             self.bullets_velocity_x = self.bullets_speed
 
             rect.x += self.bullets_velocity_x
             screen.blit(self.bullet, rect)
+
+    # create a function that control how much shot you have
+    def bullet_num_control(self):
+        if len(self.bullet_full_list) == self.bullet_num:
+            self.bullet_can_shot = False
+        else:
+            self.bullet_can_shot = True
+
+    # defined a function that let you collect bullets
+    def collect_bullets(self):
+        # create his rect
+        self.bullets_collect_rect = self.collectable_bullets.get_rect(center=(self.spawn_bullets_x, self.spawn_bullets_y))
+
+        # make it move up and down
+        self.time += 0.5
+        self.bullets_collect_rect.y = self.spawn_bullets_y + 20 * math.sin(self.time)
+
+        # show it on the screen 
+        screen.blit(self.collectable_bullets, self.bullets_collect_rect)
+
+    # check if he collect a bullets and add it to is bullets number
+    def collision_collect_bullets_and_player(self):
+        random_amount_bullets = random.randint(1, 10)
+        # check for collision
+        if self.player_rect.colliderect(self.bullets_collect_rect):
+            # get the time
+            self.current_time = pygame.time.get_ticks()
+
+            # add a random amount of bullets
+            print(random_amount_bullets)
+            self.bullet_num += random_amount_bullets
+            self.spawn_bullets_x = random.randint(0, 1515)
+            self.spawn_bullets_u = random.randint(0, 720)
+
+            # text that going to show how much bullets you get
+            self.text_bullets_font = pygame.font.Font(None, 100)
+            self.text_bullets = self.text_bullets_font.render(f"+{random_amount_bullets}", False, "black").convert_alpha()
+            self.text_bullets_rect = self.text_bullets.get_rect(center= (800,30))
+        
+        self.update()
+        # update the text display time
+    def update(self):
+                # check if the current time is less than the start time + 3000 milliseconds (3 seconds)
+        try:
+            if pygame.time.get_ticks() < self.current_time + 2000:
+                screen.blit(self.text_bullets, self.text_bullets_rect)
+        except:
+            pass
 
     def enami_settings(self):
         if self.can_spawn_enami:
@@ -186,7 +255,7 @@ class start_level_one:
                 
         # show the player
         screen.blit(self.player, self.player_rect)
-            
+
     def collision_enami_bullet(self):
         for bullet_rect in self.bullets_list:
             for enami_rect in self.enamis_list:
@@ -211,10 +280,12 @@ class start_level_one:
         screen.blit(self.settings, self.settings_rect)
 
 
+
+
 # create the screen
 pygame.init()
 screen = pygame.display.set_mode((1600,800))
-title = pygame.display.set_caption("Asteroid")
+title = pygame.display.set_caption("Shooting game")
 clock = pygame.time.Clock()
 
 # create the object of start level one
@@ -257,14 +328,17 @@ while True:
             if event.key == pygame.K_s:
                 level_one.down_pressed = False
 
-
+    screen.fill((0, 0, 0)) 
 
     level_one.show_background()
     level_one.player_movement()
     level_one.shot_bullet()
+    level_one.bullet_num_control()
+    level_one.collect_bullets()
+    level_one.collision_collect_bullets_and_player()
     level_one.enami_settings()
     level_one.collision_enami_bullet()
     level_one.settings_fun()
 
     pygame.display.update()
-    clock.tick(160)
+    clock.tick(165)
