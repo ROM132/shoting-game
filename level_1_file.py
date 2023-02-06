@@ -199,6 +199,17 @@ class start_level_one:
         # show it on the screen 
         screen.blit(self.collectable_bullets, self.bullets_collect_rect)
 
+    def show_current_bullets(self): 
+        current_bullets = self.bullet_num- len(self.bullet_full_list)
+
+        # text that going to show how much bullets you have
+        current_bullets_font = pygame.font.Font(None, 50)
+        text_bullets_current = current_bullets_font.render(f"bullets: {current_bullets}", False, "black").convert_alpha()
+        text_bullets_current_rect = text_bullets_current.get_rect(topleft= (0,60))
+
+        # show him on the screen
+        screen.blit(text_bullets_current, text_bullets_current_rect)
+
     # check if he collect a bullets and add it to is bullets number
     def collision_collect_bullets_and_player(self):
         random_amount_bullets = random.randint(1, 10)
@@ -303,7 +314,6 @@ class start_level_one:
 
 
                 self.root.mainloop()
-
     
     def closed_tkinter(self):
         self.root.destroy()
@@ -371,6 +381,7 @@ while running == True:
     level_one.shot_bullet()
     level_one.bullet_num_control()
     level_one.collect_bullets()
+    level_one.show_current_bullets()
     level_one.collision_collect_bullets_and_player()
     level_one.enami_settings()
     level_one.collision_enami_bullet()
