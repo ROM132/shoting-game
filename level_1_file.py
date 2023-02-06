@@ -33,7 +33,7 @@ class start_level_one:
         self.bullet_rect = self.bullet.get_rect(center=(self.player_rect.x+90, self.player_rect.y+50))
 
         # defined the velocity and the speed of the bullets
-        self.bullets_speed = 15
+        self.bullets_speed = 25
         self.bullets_velocity_x = 0
 
         # create a list to store all the bullets
@@ -64,7 +64,11 @@ class start_level_one:
 
 
         # enami spawn limit
-        self.enami_speed = 40
+        self.enami_speed = 10
+
+        # settings
+        self.settings = pygame.image.load('texture/settings.png').convert_alpha()
+        self.settings_rect = self.settings.get_rect(topleft=(0,0))
 
 
     def show_background(self):        
@@ -74,7 +78,7 @@ class start_level_one:
         screen_height = info.current_h
 
         # background
-        background = pygame.image.load('texture/background/background2.png').convert_alpha()
+        background = pygame.image.load('texture/background/background2.png').convert()
         image = pygame.transform.scale(background, (screen_width, screen_height))
         
         # show the background on the screen
@@ -190,9 +194,21 @@ class start_level_one:
                 # check for collision
                 if bullet_rect.colliderect(enami_rect):
                     # remove the bullet and the enami
-                    self.enamis_list.remove(enami_rect)
-                    self.bullets_list.remove(bullet_rect)
+                    try:
+                        self.enamis_list.remove(enami_rect)
+                        self.bullets_list.remove(bullet_rect)
+                    except:
+                        pass
+    
+    def settings_fun(self):
+        pos = pygame.mouse.get_pos()
 
+        if self.settings_rect.collidepoint(pos):
+            if pygame.mouse.get_pressed()[0]:
+                print('work')
+
+        
+        screen.blit(self.settings, self.settings_rect)
 
 
 # create the screen
@@ -248,6 +264,7 @@ while True:
     level_one.shot_bullet()
     level_one.enami_settings()
     level_one.collision_enami_bullet()
+    level_one.settings_fun()
 
     pygame.display.update()
-    clock.tick(120)
+    clock.tick(160)
