@@ -98,15 +98,22 @@ class start_level_one:
         self.root.destroy()
 
         mixer.init()
-
         # add sound of shot
         self.shot_sound = pygame.mixer.Sound('songs/Laser Shot.wav')
 
         # appear bullets sound
         self.appear_bullets_sound = pygame.mixer.Sound('songs/appear.ogg')
-            
+
         # volume
-        self.volume = 10
+        self.volume = 100
+
+        # background sound
+        mixer.music.load('songs/background sound.mp3')
+    
+        # play the background song infinity
+        mixer.music.set_volume(0.1)
+        mixer.music.play(-1)
+
 
 
 
@@ -119,9 +126,11 @@ class start_level_one:
         # background
         background = pygame.image.load('texture/background/background2.png').convert()
         image = pygame.transform.scale(background, (screen_width, screen_height))
-        
+            
         # show the background on the screen
         screen.blit(image, (0, 0))
+        
+
 
     def player_movement(self):
         self.angle = 0
@@ -311,7 +320,6 @@ class start_level_one:
             if pygame.mouse.get_pressed()[0]:
                 try:
                     self.root = Tk()
-                    print('work')
                 except:
                     pass
                 self.center_window(self.root, 400, 400)
@@ -319,13 +327,13 @@ class start_level_one:
                 # create the settings
 
                 # create a scale to control the music value
-                scale = Scale(self.root, from_=0, to=100, orient=HORIZONTAL, width=20)
-                scale.set(10) # set the initial value to 50
+                scale = Scale(self.root, from_=0, to=100, command=self.set_volume, orient=HORIZONTAL, width=20)
+                scale.set(self.volume) # set the initial value to 50
                 self.volume = scale.get()
             
                 
                 # create a text near the scale
-                scale_text = Label(self.root, text='Shot Sound:', font=('Times', 25))
+                scale_text = Label(self.root, text='Sound:', font=('Times', 25))
 
                 # create a setting text
                 setting_text = Label(self.root, text='Setting', font=('System', 25))
@@ -349,7 +357,17 @@ class start_level_one:
 
 
                 self.root.mainloop()
-    
+     
+    def set_volume(self, val):
+        self.volume = float(val) / 100
+        # set the new value
+        self.shot_sound.set_volume(self.volume)
+        self.appear_bullets_sound.set_volume(self.volume)
+        mixer.music.set_volume(self.volume/10)
+
+
+        self.volume = self.volume * 100
+
     def closed_tkinter(self):
         self.root.destroy()
     
@@ -363,7 +381,6 @@ class start_level_one:
 
 # create the screen
 pygame.init()
-running = True
 
 screen = pygame.display.set_mode((1600,800))
 title = pygame.display.set_caption("Shooting game")
@@ -372,8 +389,9 @@ clock = pygame.time.Clock()
 # create the object of start level one
 level_one = start_level_one()
 
+
 # start the loop
-while running == True:
+while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             exit()
