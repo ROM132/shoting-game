@@ -97,6 +97,12 @@ class start_level_one:
         self.root.title('Settings')
         self.root.destroy()
 
+        # add sound of shot
+        self.shot_sound = pygame.mixer.Sound('songs/Laser Shot.wav')
+
+        # appear bullets sound
+        self.appear_bullets_sound = pygame.mixer.Sound('songs/appear-online.ogg')
+
 
 
     def show_background(self):       
@@ -155,7 +161,8 @@ class start_level_one:
         if self.bullet_can_shot == True:
             keys = pygame.key.get_pressed()
             
-            if keys[pygame.K_SPACE] and self.check_shot:
+            if keys[pygame.K_SPACE] and self.check_shot:  
+                self.shot_sound.play()
                 self.last_shot_time = pygame.time.get_ticks()
 
                 self.bullet_rect = self.bullet.get_rect(center=(self.player_rect.x+90, self.player_rect.y+60))
@@ -215,6 +222,9 @@ class start_level_one:
         random_amount_bullets = random.randint(1, 10)
         # check for collision
         if self.player_rect.colliderect(self.bullets_collect_rect):
+            # add an appear sound
+            self.appear_bullets_sound.play()
+
             # get the time
             self.current_time = pygame.time.get_ticks()
 
@@ -299,8 +309,11 @@ class start_level_one:
                     print('work')
                 except:
                     pass
-
                 self.center_window(self.root, 400, 400)
+
+                # create the settings
+
+
 
 
 
