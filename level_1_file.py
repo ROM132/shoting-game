@@ -97,11 +97,16 @@ class start_level_one:
         self.root.title('Settings')
         self.root.destroy()
 
+        mixer.init()
+
         # add sound of shot
         self.shot_sound = pygame.mixer.Sound('songs/Laser Shot.wav')
 
         # appear bullets sound
         self.appear_bullets_sound = pygame.mixer.Sound('songs/appear.ogg')
+            
+        # volume
+        self.volume = 10
 
 
 
@@ -313,6 +318,24 @@ class start_level_one:
 
                 # create the settings
 
+                # create a scale to control the music value
+                scale = Scale(self.root, from_=0, to=100, orient=HORIZONTAL, width=20)
+                scale.set(10) # set the initial value to 50
+                self.volume = scale.get()
+            
+                
+                # create a text near the scale
+                scale_text = Label(self.root, text='Shot Sound:', font=('Times', 25))
+
+                # create a setting text
+                setting_text = Label(self.root, text='Setting', font=('System', 25))
+
+                # show the settings text
+                setting_text.grid(row=0, column=0, columnspan=10, pady=10, padx=135, sticky='nsew')
+
+                # show the scale and the scale text
+                scale.grid(row=2, column=1, sticky='w')
+                scale_text.grid(row=2, column=0, pady=5)
 
 
 
