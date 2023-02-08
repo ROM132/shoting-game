@@ -219,7 +219,6 @@ class start_level_one:
             self.current_time = pygame.time.get_ticks()
 
             # add a random amount of bullets
-            print(random_amount_bullets)
             self.bullet_num += random_amount_bullets
             self.spawn_bullets_x = random.randint(0, 1515)
             self.spawn_bullets_u = random.randint(0, 720)
