@@ -170,6 +170,7 @@ class start_screen:
                     level = level_data[i]
 
                     if level in level_messages:
+                        mixer.music.set_volume(0)
                         level_messages[level]()
                         pygame.quit()
                     else:

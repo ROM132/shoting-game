@@ -377,7 +377,12 @@ class start_level_one:
         x_coord = (screen_width/2) - (window_width/2)
         y_coord = (screen_height/2) - (window_height/2)
         root.geometry("%dx%d+%d+%d" % (window_width, window_height, x_coord, y_coord))
-        
+    
+    def check__lose(self):
+        for rect in self.enamis_list:
+            if self.player_rect.colliderect(rect):
+                print('You lost')
+                exit()
 
 # create the screen
 pygame.init()
@@ -439,6 +444,7 @@ while True:
     level_one.enami_settings()
     level_one.collision_enami_bullet()
     level_one.settings_fun()
+    level_one.check__lose()
 
     pygame.display.update()
     clock.tick(165)
